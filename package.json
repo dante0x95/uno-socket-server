@@ -30,7 +30,7 @@
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/node": "^26.1.1",
-    "commit-and-tag-version": "^13.0.0",
+    "commit-and-tag-version": "^13.1.0",
     "eslint": "^10.7.0",
     "eslint-plugin-perfectionist": "^5.10.0",
     "eslint-plugin-unicorn": "^72.0.0",
