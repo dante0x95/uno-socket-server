@@ -163,7 +163,7 @@ describe("LeaveRoom", () => {
     expect(result.room.players).toEqual([{ id: "player2", connectionId: "conn2" }, { id: "player3", connectionId: "conn3" }]);
   });
 
-  it("deletes the room if dont have at last 2 players", async () => {
+  it("deletes the room when only one player remains", async () => {
     const room: Room = {
       id: "room-id",
       code: "ROOMCODE",
@@ -187,13 +187,52 @@ describe("LeaveRoom", () => {
 
     const leaveRoom = new LeaveRoom(roomRepository);
 
-    const input = {
+    await leaveRoom.execute({
       roomCode: "ROOMCODE",
       playerId: "owner-id",
+    });
+
+    expect(deleteByCodeMock).toHaveBeenCalledOnce();
+    expect(deleteByCodeMock).toHaveBeenCalledWith("ROOMCODE");
+    expect(saveMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps and saves the room when two players remain", async () => {
+    const room: Room = {
+      id: "room-id",
+      code: "ROOMCODE",
+      ownerId: "owner-id",
+      players: [
+        { id: "owner-id", connectionId: "conn1" },
+        { id: "player2", connectionId: "conn2" },
+        { id: "player3", connectionId: "conn3" },
+      ],
+      createdAt: new Date(),
     };
 
-    await leaveRoom.execute(input);
+    const saveMock = vi.fn();
+    const deleteByCodeMock = vi.fn();
+    const findByCodeMock = vi.fn().mockResolvedValue(room);
 
-    expect(deleteByCodeMock).toHaveBeenCalledWith("ROOMCODE");
+    const roomRepository: RoomRepository = {
+      save: saveMock,
+      findByCode: findByCodeMock,
+      deleteByCode: deleteByCodeMock,
+    };
+
+    const leaveRoom = new LeaveRoom(roomRepository);
+
+    await leaveRoom.execute({
+      roomCode: "ROOMCODE",
+      playerId: "player3",
+    });
+
+    expect(room.players).toEqual([
+      { id: "owner-id", connectionId: "conn1" },
+      { id: "player2", connectionId: "conn2" },
+    ]);
+
+    expect(saveMock).toHaveBeenCalledWith(room);
+    expect(deleteByCodeMock).not.toHaveBeenCalled();
   });
 });
