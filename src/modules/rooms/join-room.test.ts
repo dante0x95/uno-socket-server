@@ -2,12 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import { JoinRoom } from "./join-room.js";
 
-import type { RoomRepository } from "./room.repository.js";
+import type { JoinRoomRepository } from "./join-room.js";
 
 describe("joinRoom", () => {
   it("should throw an error if the room does not exist", async () => {
     const save = vi.fn();
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: JoinRoomRepository = {
       save,
       findByCode: vi.fn().mockResolvedValue(null),
     };
@@ -28,7 +28,7 @@ describe("joinRoom", () => {
     };
 
     const save = vi.fn();
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: JoinRoomRepository = {
       save: vi.fn(),
       findByCode: vi.fn().mockResolvedValue(existingRoom),
     };
@@ -54,7 +54,7 @@ describe("joinRoom", () => {
     };
 
     const save = vi.fn();
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: JoinRoomRepository = {
       save,
       findByCode: vi.fn().mockResolvedValue(existingRoom),
     };
@@ -95,7 +95,7 @@ describe("joinRoom", () => {
 
     const save = vi.fn();
     const findByCode = vi.fn().mockResolvedValue(existingRoom);
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: JoinRoomRepository = {
       save,
       findByCode,
     };
@@ -116,7 +116,7 @@ describe("joinRoom", () => {
     };
 
     const repositoryError = new Error("Failed to save room");
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: JoinRoomRepository = {
       save: vi.fn().mockRejectedValue(repositoryError),
       findByCode: vi.fn().mockResolvedValue(existingRoom),
     };

@@ -12,8 +12,10 @@ interface CreateRoomOutput {
   room: Room;
 }
 
+export type CreateRoomRepository = Pick<RoomRepository, "save">;
+
 export class CreateRoom {
-  constructor(private readonly roomRepository: RoomRepository) {}
+  constructor(private readonly roomRepository: CreateRoomRepository) {}
 
   async execute(input: CreateRoomInput): Promise<CreateRoomOutput> {
     const room: Room = {

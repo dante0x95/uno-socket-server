@@ -11,8 +11,13 @@ interface JoinRoomOutput {
   room: Room;
 }
 
+export type JoinRoomRepository = Pick<
+  RoomRepository,
+  "findByCode" | "save"
+>;
+
 export class JoinRoom {
-  constructor(private readonly roomRepository: RoomRepository) {}
+  constructor(private readonly roomRepository: JoinRoomRepository) {}
 
   async execute(input: JoinRoomInput): Promise<JoinRoomOutput> {
     const roomCode = input.roomCode.trim().toUpperCase();

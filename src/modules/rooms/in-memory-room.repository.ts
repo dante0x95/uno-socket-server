@@ -15,4 +15,10 @@ export class InMemoryRoomRepository implements RoomRepository {
 
     return room ? structuredClone(room) : null;
   }
+
+  deleteByCode(code: string): Promise<void> {
+    this.roomsByCode.delete(code);
+
+    return Promise.resolve();
+  }
 }

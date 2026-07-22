@@ -1,14 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { CreateRoom } from "./create-room.js";
-
-import type { RoomRepository } from "./room.repository.js";
+import { CreateRoom, type CreateRoomRepository } from "./create-room.js";
 
 describe("createRoom", () => {
   it("creates a room with the requesting player as owner", async () => {
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: CreateRoomRepository = {
       save: vi.fn(),
-      findByCode: vi.fn(),
     };
 
     const createRoomInstance = new CreateRoom(mockRoomRepository);
@@ -26,9 +23,8 @@ describe("createRoom", () => {
   it("saves the room using the RoomRepository", async () => {
     const save = vi.fn();
 
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: CreateRoomRepository = {
       save,
-      findByCode: vi.fn(),
     };
 
     const createRoomInstance = new CreateRoom(mockRoomRepository);
@@ -45,9 +41,8 @@ describe("createRoom", () => {
 
   it("throws when the repository cannot save the room", async () => {
     const repositoryError = new Error("Failed to save room");
-    const mockRoomRepository: RoomRepository = {
+    const mockRoomRepository: CreateRoomRepository = {
       save: vi.fn().mockRejectedValue(repositoryError),
-      findByCode: vi.fn(),
     };
 
     const createRoomInstance = new CreateRoom(mockRoomRepository);
