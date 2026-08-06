@@ -5,10 +5,17 @@ interface LeaveRoomInput {
   roomCode: string;
   playerId: string;
 }
-
-interface LeaveRoomOutput {
-  room: Room;
-}
+type LeaveRoomOutput
+  = | {
+    status: "updated";
+    room: Room;
+    playerId: string;
+  }
+  | {
+    status: "deleted";
+    room: Room;
+    playerId: string;
+  };
 
 export class LeaveRoom {
   constructor(private readonly roomRepository: RoomRepository) {}
@@ -35,18 +42,18 @@ export class LeaveRoom {
       (player) => player.id !== input.playerId,
     );
 
-    const newOwnerId = room.players[0];
+    const newOwner = room.players[0];
 
     if (room.players.length < 2) {
       await this.roomRepository.deleteByCode(room.code);
-      return { room };
+      return { status: "deleted", room, playerId: input.playerId };
     }
-    if (ownerIsLeaving && newOwnerId) {
-      room.ownerId = newOwnerId.id;
+    if (ownerIsLeaving && newOwner) {
+      room.ownerId = newOwner.id;
     }
 
     await this.roomRepository.save(room);
 
-    return { room };
+    return { status: "updated", room, playerId: input.playerId };
   }
 }

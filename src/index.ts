@@ -2,6 +2,7 @@ import { ConnectionRegistry } from "./modules/connections/connection-registry.js
 import { CreateRoom } from "./modules/rooms/create-room.js";
 import { InMemoryRoomRepository } from "./modules/rooms/in-memory-room.repository.js";
 import { JoinRoom } from "./modules/rooms/join-room.js";
+import { LeaveRoom } from "./modules/rooms/leave-room.js";
 import { logger } from "./shared/logging/logger.js";
 import { MessageRouter } from "./websocket/message-router.js";
 import { createWebSocketServer } from "./websocket/websocket-server.js";
@@ -13,11 +14,13 @@ const connectionRegistry = new ConnectionRegistry();
 
 const createRoom = new CreateRoom(roomRepository);
 const joinRoom = new JoinRoom(roomRepository);
+const leaveRoom = new LeaveRoom(roomRepository);
 
 const messageRouter = new MessageRouter({
   createRoom,
   joinRoom,
   connectionRegistry,
+  leaveRoom,
 });
 
 createWebSocketServer({

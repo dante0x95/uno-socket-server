@@ -1,13 +1,15 @@
-import { clientMessageSchema } from "./message.schema.js";
+import { type ClientMessage, clientMessageSchema } from "./message.schema.js";
 
 import type { ConnectionRegistry } from "../modules/connections/connection-registry.js";
 import type { CreateRoom } from "../modules/rooms/create-room.js";
 import type { JoinRoom } from "../modules/rooms/join-room.js";
+import type { LeaveRoom } from "../modules/rooms/leave-room.js";
 import type { WebSocket } from "ws";
 
 interface MessageRouterDependencies {
   createRoom: CreateRoom;
   joinRoom: JoinRoom;
+  leaveRoom: LeaveRoom;
   connectionRegistry: ConnectionRegistry;
 }
 
@@ -76,6 +78,9 @@ export class MessageRouter {
 
           return;
         }
+        case "room.leave":
+          await this.handleLeaveRoom(connectionId, socket, message);
+          return;
       }
     } catch (error) {
       this.send(socket, {
@@ -84,6 +89,40 @@ export class MessageRouter {
         code: error instanceof Error ? error.message : "UNKNOWN_ERROR",
       });
     }
+  }
+
+  private async handleLeaveRoom(
+    connectionId: string,
+    socket: WebSocket,
+    message: Extract<ClientMessage, { type: "room.leave" }>,
+  ): Promise<void> {
+    const result = await this.dependencies.leaveRoom.execute({
+      playerId: message.payload.playerId,
+      roomCode: message.payload.roomCode,
+    });
+
+    this.send(socket, {
+      type: "room.left",
+      requestId: message.requestId,
+      roomCode: result.room.code,
+      playerId: result.playerId,
+    });
+
+    if (result.status === "updated") {
+      this.broadcastToRoom(result.room.players, {
+        type: "room.updated",
+        requestId: message.requestId,
+        room: result.room,
+      });
+
+      return;
+    }
+
+    this.broadcastToRoom(result.room.players, {
+      type: "room.deleted",
+      requestId: message.requestId,
+      roomCode: result.room.code,
+    });
   }
 
   private broadcastToRoom(

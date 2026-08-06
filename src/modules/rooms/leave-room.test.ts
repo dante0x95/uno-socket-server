@@ -42,6 +42,8 @@ describe("LeaveRoom", () => {
       ...room,
       players: [{ id: "player2", connectionId: "conn2" }, { id: "player3", connectionId: "conn3" }],
     });
+    expect(result.status).toBe("updated");
+
     expect(result.room.players).toEqual([{ id: "player2", connectionId: "conn2" }, { id: "player3", connectionId: "conn3" }]);
   });
 
@@ -222,15 +224,18 @@ describe("LeaveRoom", () => {
 
     const leaveRoom = new LeaveRoom(roomRepository);
 
-    await leaveRoom.execute({
+    const result = await leaveRoom.execute({
       roomCode: "ROOMCODE",
       playerId: "player3",
     });
 
-    expect(room.players).toEqual([
+    expect(result.room.players).toEqual([
       { id: "owner-id", connectionId: "conn1" },
       { id: "player2", connectionId: "conn2" },
     ]);
+    expect(result.status).toBe("updated");
+    expect(result.status).toBe("updated");
+    expect(result.playerId).toBe("player3");
 
     expect(saveMock).toHaveBeenCalledWith(room);
     expect(deleteByCodeMock).not.toHaveBeenCalled();
